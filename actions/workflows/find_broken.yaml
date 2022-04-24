@@ -39,5 +39,15 @@ tasks:
     input:
       data: <% item() %>
     next:
-
-
+      - when: <% failed() %>
+        publish:
+          - msg: "Failed to retrieve accounts from: <% item() %>. <% result().result %>"
+        do:
+          - log
+          - continue
+      - when: <% succeeded() %>
+        publish:
+          - msg: "From safe: <% item() %>, retrieve <% len(result().result) %> accounts."
+          - accounts: <% ctx(accounts) + result().result %>
+        do:
+          - log
