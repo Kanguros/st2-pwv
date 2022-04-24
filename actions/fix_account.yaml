@@ -1,0 +1,12 @@
+---
+name: "fix_account"
+runner_type: "python-script"
+description: "This sends an SMS using twilio."
+enabled: true
+entry_point: "fix_account.py"
+parameters:
+    params:
+        type: "object"
+        description: "Account attribiutes received from PWV."
+        required: true
+        position: 0

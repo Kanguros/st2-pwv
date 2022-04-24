@@ -1,0 +1,43 @@
+version: 1.0
+
+input:
+  - safes
+
+
+vars:
+  - all_accounts: []
+  - working_accounts: []
+  - fixed_accounts: []
+
+tasks:
+  find_accounts:
+    with:
+      items: <% ctx(safes) %>
+      concurrency: 2
+    action: pwv.find_accounts
+    input:
+      safe: <% item() %>
+    next:
+      - when: <% failed() %>
+        publish:
+          - msg: "Failed to retrieve accounts from: <% item() %>. <% result().result %>"
+        do:
+          - log
+          - continue
+      - when: <% succeeded() %>
+        publish:
+          - msg: "From safe: <% item() %>, retrieve <% len(result().result) %> accounts."
+          - accounts: <% ctx(accounts) + result().result %>
+        do:
+          - log
+
+  find_broke:
+    with:
+      items: <% ctx(accounts) %>
+      concurrency: 10
+    action: pwv.fix_account
+    input:
+      data: <% item() %>
+    next:
+
+
